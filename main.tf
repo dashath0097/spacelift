@@ -6,9 +6,7 @@ terraform {
     }
   }
 }
-provider "aws" {
-  region = "us-east-1"  # Change to your preferred AWS region
-}
+
 
 
 provider "spacelift" {
@@ -32,11 +30,4 @@ resource "spacelift_aws_integration" "aws_integration" {
   name     = "aws-integration-${var.aws_account_id}"
   role_arn = "arn:aws:iam::${var.aws_account_id}:role/Spacelift"
   generate_credentials_in_worker = false
-}
-# Attach the AWS integration to the specified Spacelift stack
-resource "spacelift_aws_integration_attachment" "aws_attach" {
-  stack_id       = var.stack_name
-  integration_id = spacelift_aws_integration.aws_integration.id
-  read           = true  # Allow read access
-  write          = true  # Allow write access
 }
