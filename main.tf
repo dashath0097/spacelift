@@ -29,10 +29,5 @@ resource "spacelift_aws_integration" "aws_integration" {
   role_arn = "arn:aws:iam::${var.aws_account_id}:role/Spacelift"
   generate_credentials_in_worker = false
 }
-resource "spacelift_aws_integration_attachment" "aws_attach" {
-  integration_id = spacelift_aws_integration.aws_integration.id
-  stack_id       = var.stack_name
-  read           = true
-  write          = true
-}
+
 
