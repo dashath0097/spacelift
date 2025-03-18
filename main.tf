@@ -17,15 +17,15 @@ variable "aws_account_id" {
   type        = string
 }
 
-# Fetch Stack ID dynamically
-variable "stack_id" {
-  description = "Spacelift Stack ID"
+# Fetch Stack Name instead of Stack ID
+variable "stack_name" {
+  description = "Spacelift Stack Name"
   type        = string
 }
 
-# Get the current stack details
+# Get the current stack details using name instead of ID
 data "spacelift_stack" "current" {
-  stack_id = var.stack_id
+  name = var.stack_name
 }
 
 # Create an AWS integration in Spacelift
@@ -35,10 +35,10 @@ resource "spacelift_aws_integration" "aws_integration" {
   generate_credentials_in_worker = false
 }
 
-# Attach the integration to the current stack
+# Attach the integration to the current stack using stack_name
 resource "spacelift_aws_integration_attachment" "aws_attach" {
   integration_id = spacelift_aws_integration.aws_integration.id
-  stack_id       = var.stack_id
+  stack_id       = data.spacelift_stack.current.id
   read           = true
   write          = true
 }
