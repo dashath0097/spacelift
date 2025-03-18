@@ -11,9 +11,13 @@ provider "spacelift" {
   # Ensure credentials are set via environment variables or Spacelift access keys
 }
 
-
 variable "aws_account_id" {
   description = "AWS Account ID provided in the blueprint"
+  type        = string
+}
+
+variable "stack_name" {
+  description = "Stack name provided in the blueprint"
   type        = string
 }
 
@@ -23,7 +27,6 @@ resource "spacelift_aws_integration" "aws_integration" {
   role_arn                        = "arn:aws:iam::${var.aws_account_id}:role/SpaceliftIntegrationRole"
   generate_credentials_in_worker  = false
 }
-
 
 # Optional: Attach the integration to the stack
 resource "spacelift_aws_integration_attachment" "integration_attachment" {
@@ -48,7 +51,7 @@ resource "spacelift_stack" "stack" {
   vendor {
     terraform {
       manage_state = true
-      version      = "1.3.0"
+      version      = "1.5.0"
     }
   }
 }
