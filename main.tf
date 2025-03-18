@@ -17,10 +17,15 @@ variable "aws_account_id" {
   type        = string
 }
 
+# Get the current stack details
+data "spacelift_stack" "current" {
+  stack_id = getenv("SPACELIFT_STACK_ID")  # Fetches the Stack ID dynamically
+}
+
 # Create an AWS integration in Spacelift
 resource "spacelift_aws_integration" "aws_integration" {
-  name                           = "aws-integration-${var.aws_account_id}"
-  role_arn                       = "arn:aws:iam::${var.aws_account_id}:role/Spacelift"
+  name     = "aws-integration-${var.aws_account_id}"
+  role_arn = "arn:aws:iam::${var.aws_account_id}:role/Spacelift"
   generate_credentials_in_worker = false
 }
 
@@ -31,6 +36,3 @@ resource "spacelift_aws_integration_attachment" "aws_attach" {
   read           = true
   write          = true
 }
-
-# Get the current stack where this Terraform code is running
-data "spacelift_stack" "current" {}
