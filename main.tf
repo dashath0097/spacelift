@@ -8,50 +8,29 @@ terraform {
 }
 
 provider "spacelift" {
-  # Ensure credentials are set via environment variables or Spacelift access keys
+  # Spacelift API credentials (configured via environment variables)
 }
 
+# Fetch the AWS account ID from input
 variable "aws_account_id" {
-  description = "AWS Account ID provided in the blueprint"
+  description = "AWS Account ID for integration"
   type        = string
 }
 
-variable "stack_name" {
-  description = "Stack name provided in the blueprint"
-  type        = string
-}
-
-# Use the variable in the AWS integration
+# Create an AWS integration in Spacelift
 resource "spacelift_aws_integration" "aws_integration" {
-  name                            = "aws-integration-${var.aws_account_id}"
-  role_arn                        = "arn:aws:iam::${var.aws_account_id}:role/SpaceliftIntegrationRole"
-  generate_credentials_in_worker  = false
+  name                           = "aws-integration-${var.aws_account_id}"
+  role_arn                       = "arn:aws:iam::${var.aws_account_id}:role/Spacelift"
+  generate_credentials_in_worker = false
 }
 
-# Optional: Attach the integration to the stack
-resource "spacelift_aws_integration_attachment" "integration_attachment" {
+# Attach the integration to the current stack
+resource "spacelift_aws_integration_attachment" "aws_attach" {
   integration_id = spacelift_aws_integration.aws_integration.id
-  stack_id       = spacelift_stack.stack.id
+  stack_id       = data.spacelift_stack.current.id
   read           = true
   write          = true
 }
 
-# Define the Spacelift stack
-resource "spacelift_stack" "stack" {
-  name  = var.stack_name
-  space = "root"
-
-  vcs {
-    provider   = "GITHUB_ENTERPRISE"
-    namespace  = "dashath0097"
-    repository = "spacelift"
-    branch     = "main"
-  }
-
-  vendor {
-    terraform {
-      manage_state = true
-      version      = "1.5.0"
-    }
-  }
-}
+# Get the current stack where this Terraform code is running
+data "spacelift_stack" "current" {}
