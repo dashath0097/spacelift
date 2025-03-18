@@ -11,15 +11,21 @@ provider "spacelift" {
   # Spacelift API credentials (configured via environment variables)
 }
 
-# Fetch the AWS account ID from input
+# Fetch AWS Account ID from input
 variable "aws_account_id" {
   description = "AWS Account ID for integration"
   type        = string
 }
 
+# Fetch Stack ID dynamically
+variable "stack_id" {
+  description = "Spacelift Stack ID"
+  type        = string
+}
+
 # Get the current stack details
 data "spacelift_stack" "current" {
-  stack_id = getenv("SPACELIFT_STACK_ID")  # Fetches the Stack ID dynamically
+  stack_id = var.stack_id
 }
 
 # Create an AWS integration in Spacelift
@@ -32,7 +38,7 @@ resource "spacelift_aws_integration" "aws_integration" {
 # Attach the integration to the current stack
 resource "spacelift_aws_integration_attachment" "aws_attach" {
   integration_id = spacelift_aws_integration.aws_integration.id
-  stack_id       = data.spacelift_stack.current.id
+  stack_id       = var.stack_id
   read           = true
   write          = true
 }
